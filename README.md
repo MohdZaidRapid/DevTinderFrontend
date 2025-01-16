@@ -14,3 +14,12 @@ Body
      Route=/login => Login
      Route=/Connections =>Connections
      Router-=/profile => Profile
+
+
+
+     axios 
+     cors
+     config
+     credentials:true,
+     orign:""
+     in forntend:with credentials:true
