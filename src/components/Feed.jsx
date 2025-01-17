@@ -2,12 +2,12 @@ import axios from "axios";
 import React, { useEffect } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
-import { addFeed, removeFeed } from "../utils/feedSlice.js";
+import { addFeed } from "../utils/feedSlice.js";
 import UserCard from "./UserCard.jsx";
 
 const Feed = () => {
   const feed = useSelector((store) => store.feed);
-  
+
   const dispatch = useDispatch();
 
   const getFeed = async () => {
@@ -25,7 +25,11 @@ const Feed = () => {
   useEffect(() => {
     getFeed();
   }, []);
-
+  if (!feed) return;
+  if (feed.length <= 0)
+    return (
+      <h1 className="flex items-center justify-center">No new user found!</h1>
+    );
   return (
     feed && (
       <div className="flex justify-center my-10">
