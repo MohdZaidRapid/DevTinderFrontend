@@ -2,43 +2,43 @@ import axios from "axios";
 import React, { useEffect } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
-import { addConnections } from "../utils/connectionSlice";
+import { addRequest } from "../utils/requestSlice";
 
-const Connections = () => {
-  const connections = useSelector((store) => store.connections);
+const Requests = () => {
+  const requests = useSelector((store) => store.requests);
   const dispatch = useDispatch();
-  const fetchConnections = async () => {
+  const fetchRequest = async () => {
     try {
-      const res = await axios.get(BASE_URL + "/user/connections", {
+      const res = await axios.get(BASE_URL + "/user/requests/received", {
         withCredentials: true,
       });
-      console.log(res?.data?.data);
-      dispatch(addConnections(res?.data?.data));
-    } catch (err) {
-      //
-      console.log(err);
+      console.log(res);
+
+      dispatch(addRequest(res?.data?.data));
+    } catch (error) {
+      console.log(error);
     }
   };
 
   useEffect(() => {
-    fetchConnections();
+    fetchRequest();
   }, []);
 
-  if (!connections) return;
+  if (!requests) return;
 
-  if (connections.length === 0) {
-    return <h1>No Connections Found!</h1>;
+  if (requests.length === 0) {
+    return <h1>No Request Found!</h1>;
   }
   return (
     <div className="text-center my-10">
-      <h1 className="text-bold text-black text-3xl ">Connections</h1>
-      {connections.map((connection) => {
+      <h1 className="text-bold text-black text-3xl ">Connection Request</h1>
+      {requests.map((request) => {
         const { firstName, lastName, photoUrl, age, gender, about, _id } =
-          connection;
+          request.fromUserId;
         return (
           <div
             key={_id}
-            className="flex  p-4 m-4 rounded-lg bg-base-300 w-1/2 mx-auto"
+            className="flex  justify-between items-center p-4 m-4 rounded-lg bg-base-300 w-2/3 mx-auto"
           >
             <div>
               <img
@@ -54,6 +54,10 @@ const Connections = () => {
               <p>{about}</p>
               {age && gender && <p>{age + ", " + gender}</p>}
             </div>
+            <div>
+              <button className="btn btn-primary mx-2">Reject</button>
+              <button className="btn btn-secondary  mx-2">Accept</button>
+            </div>
           </div>
         );
       })}
@@ -61,4 +65,4 @@ const Connections = () => {
   );
 };
 
-export default Connections;
+export default Requests;
