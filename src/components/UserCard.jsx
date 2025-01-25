@@ -23,7 +23,11 @@ const UserCard = ({ user }) => {
     } catch (error) {
       setIsError(true);
       setErrors(error?.response?.data?.message);
-      dispatch(removeUserFromFeed(userId));
+      setTimeout(() => {
+        dispatch(removeUserFromFeed(userId));
+      }, 2000);
+
+      // dispatch(removeUserFromFeed(userId));
       console.log("err", error?.response?.data?.message);
     }
   };
