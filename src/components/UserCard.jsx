@@ -1,15 +1,19 @@
 import axios from "axios";
-import React from "react";
+import React, { useState } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
 
 const UserCard = ({ user }) => {
   const { _id, firstName, lastName, photoUrl, gender, age, about } = user;
+  const [errors, setErrors] = useState("");
+  const [isError, setIsError] = useState(false);
   const dispatch = useDispatch();
 
   const handleSentRequest = async (status, userId) => {
     try {
+      setErrors("");
+      setIsError(false);
       const res = await axios.post(
         BASE_URL + "/request/sent/" + status + "/" + userId,
         {},
@@ -17,7 +21,10 @@ const UserCard = ({ user }) => {
       );
       dispatch(removeUserFromFeed(userId));
     } catch (error) {
-      console.log(error);
+      setIsError(true);
+      setErrors(error?.response?.data?.message);
+      dispatch(removeUserFromFeed(userId));
+      console.log("err", error?.response?.data?.message);
     }
   };
   return (
@@ -38,12 +45,19 @@ const UserCard = ({ user }) => {
           </button>
           <button
             className="btn btn-secondary"
-            onClick={() => handleSentRequest("interested",_id)}
+            onClick={() => handleSentRequest("interested", _id)}
           >
             Interested
           </button>
         </div>
       </div>
+      {isError && (
+        <div className="toast toast-top toast-center">
+          <div className="alert alert-success">
+            <span>{errors}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
