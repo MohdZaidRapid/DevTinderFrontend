@@ -8,7 +8,6 @@ const NavBar = () => {
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // console.log(user);
 
   const handleLogout = async () => {
     try {
@@ -43,24 +42,30 @@ const NavBar = () => {
               </div>
               <ul
                 tabIndex={0}
-                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+                className="menu menu-sm dropdown-content bg-gray-800 text-white rounded-box z-50 mt-3 w-52 p-2 shadow-xl"
+                style={{
+                  position: "absolute", 
+                  top: "100%", // Ensure it opens below the avatar
+                  left: "50%", // Align with the center of the avatar
+                  transform: "translateX(-50%)" // Center horizontally
+                }}
               >
-                <li>
-                  <Link to="/profile" className="justify-between">
-                    Profile
-                    <span className="badge">New</span>
-                  </Link>
-                </li>
-                <li>
+                <li className="hover:bg-gray-700 rounded p-2">
                   <Link to="/connections">Connections</Link>
                 </li>
-                <li>
+                <li className="hover:bg-gray-700 rounded p-2">
                   <Link to="/requests">Requests</Link>
                 </li>
-                <li>
+                <li className="hover:bg-gray-700 rounded p-2">
                   <Link to="/premium">Premium</Link>
                 </li>
-                <li>
+                <li className="hover:bg-gray-700 rounded p-2">
+                  <Link to="/profile">Profile</Link>
+                </li>
+                <li className="hover:bg-gray-700 rounded p-2">
+                  <Link to="/block/user">Block Users</Link>
+                </li>
+                <li className="hover:bg-gray-700 rounded p-2">
                   <a onClick={handleLogout}>Logout</a>
                 </li>
               </ul>

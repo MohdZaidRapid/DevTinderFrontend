@@ -13,7 +13,7 @@ const Connections = () => {
       const res = await axios.get(BASE_URL + "/user/connections", {
         withCredentials: true,
       });
-      console.log(res?.data?.data);
+      
       dispatch(addConnections(res?.data?.data));
     } catch (err) {
       // setErrors("");
@@ -22,7 +22,6 @@ const Connections = () => {
   };
 
   useEffect(() => {
-    setErrors("");
     fetchConnections();
   }, []);
 
