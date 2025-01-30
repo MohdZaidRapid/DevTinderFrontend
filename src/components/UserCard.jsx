@@ -1,10 +1,10 @@
-import axios from "axios";
 import React, { useState } from "react";
+import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
 
-const UserCard = ({ user }) => {
+const UserCard = ({ user, currentIndex }) => {
   const { _id, firstName, lastName, photoUrl, gender, age, about } = user;
   const [message, setMessage] = useState("");
   const [isMessage, setIsMessage] = useState(false);
@@ -16,12 +16,12 @@ const UserCard = ({ user }) => {
     try {
       setErrors("");
       setIsError(false);
-      const res = await axios.post(
+      await axios.post(
         `${BASE_URL}/request/sent/${status}/${userId}`,
         {},
         { withCredentials: true }
       );
-      dispatch(removeUserFromFeed(userId)); // Properly remove the user from the feed
+      dispatch(removeUserFromFeed(userId)); // Remove the user from the feed
     } catch (error) {
       setIsError(true);
       setErrors(error?.response?.data?.message);
@@ -39,7 +39,7 @@ const UserCard = ({ user }) => {
       );
       setIsMessage(true);
       setMessage(res?.data?.message);
-      dispatch(removeUserFromFeed(userId)); // Correctly dispatch action to remove the blocked user
+      dispatch(removeUserFromFeed(userId)); // Remove the blocked user
     } catch (error) {
       setErrors(error?.response?.data?.message);
       setIsError(true);
