@@ -14,11 +14,15 @@ import BlockedUser from "./components/BlockedUser";
 import WithRoleAuth from "./components/WithRoleAuth"; // Capitalized HOC
 import Example from "./components/Example"; // Capitalized Component
 import AdminDashboard from "./components/AdminDashboard";
+import CheckBlockStatus from "./components/CheckBlockStatus";
+import Blocked from "./components/Blocked";
 
 function App() {
   return (
     <Provider store={appStore}>
       <BrowserRouter basename="/">
+        <CheckBlockStatus />
+
         <Routes>
           <Route path="/" element={<Body />}>
             <Route path="/" element={<Feed />} />
@@ -29,6 +33,7 @@ function App() {
             <Route path="/requests" element={<Requests />} />
             <Route path="/chat/:targetUserId" element={<Chat />} />
             <Route path="/block/user" element={<BlockedUser />} />
+            <Route path="/blocked" element={<Blocked />} />
 
             {/* Admin Routes Protected by HOC */}
             <Route
