@@ -27,7 +27,6 @@ const Login = () => {
       );
 
       dispatch(addUser(res.data.user));
-
       return navigate("/");
     } catch (error) {
       setError(error?.response?.data || "Something went wrong");
@@ -53,80 +52,73 @@ const Login = () => {
       console.log(error);
     }
   };
+
   return (
-    <div className="flex justify-center my-10">
-      <div className="card bg-base-300 w-96 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title justify-center">
-            {isLoginForm ? "Login" : "SignUp"}{" "}
+    <div className="flex justify-center my-10 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen">
+      <div className="card bg-white shadow-xl w-80 max-h-[450px] rounded-xl p-4 transform hover:scale-105 transition-all">
+        <div className="card-body p-4 overflow-y-auto">
+          <h2 className="card-title text-center text-lg font-semibold text-indigo-600">
+            {isLoginForm ? "Login" : "SignUp"}
           </h2>
           <div>
             {!isLoginForm && (
               <>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">First Name</span>
-                  </div>
+                <label className="form-control w-full my-1">
+                  <span className="label-text text-indigo-600 text-sm">First Name</span>
                   <input
                     type="text"
                     value={firstName}
-                    className="input input-bordered w-full max-w-xs"
+                    className="input input-bordered w-full bg-purple-50 focus:ring-2 focus:ring-purple-400 text-sm"
                     onChange={(e) => setFirstName(e.target.value)}
                   />
                 </label>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">Last Name</span>
-                  </div>
+                <label className="form-control w-full my-1">
+                  <span className="label-text text-indigo-600 text-sm">Last Name</span>
                   <input
                     type="text"
                     value={lastName}
-                    className="input input-bordered w-full max-w-xs"
+                    className="input input-bordered w-full bg-purple-50 focus:ring-2 focus:ring-purple-400 text-sm"
                     onChange={(e) => setLastName(e.target.value)}
                   />
                 </label>
               </>
             )}
 
-            <label className="form-control w-full max-w-xs my-2">
-              <div className="label">
-                <span className="label-text">Email Id</span>
-              </div>
+            <label className="form-control w-full my-1">
+              <span className="label-text text-indigo-600 text-sm">Email Id</span>
               <input
                 type="text"
                 value={emailId}
-                className="input input-bordered w-full max-w-xs"
+                className="input input-bordered w-full bg-purple-50 focus:ring-2 focus:ring-purple-400 text-sm"
                 onChange={(e) => setEmailId(e.target.value)}
               />
             </label>
-            <label className="form-control w-full max-w-xs my-2">
-              <div className="label">
-                <span className="label-text">Password</span>
-              </div>
+            <label className="form-control w-full my-1">
+              <span className="label-text text-indigo-600 text-sm">Password</span>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input input-bordered w-full max-w-xs"
+                className="input input-bordered w-full bg-purple-50 focus:ring-2 focus:ring-purple-400 text-sm"
               />
             </label>
           </div>
-          <p className="text-red-500">{error}</p>
-          <div className="card-actions justify-center m-2">
+          <p className="text-red-500 text-center text-xs">{error}</p>
+          <div className="card-actions justify-center my-2">
             <button
-              className="btn btn-primary"
+              className="btn bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 text-white hover:from-pink-600 hover:via-purple-700 hover:to-indigo-800 text-sm"
               onClick={isLoginForm ? handleLogin : handleSignUp}
             >
               {isLoginForm ? "Login" : "SignUp"}
             </button>
           </div>
           <p
-            className="m-auto cursor-pointer py-2"
+            className="m-auto cursor-pointer text-center text-purple-600 hover:text-purple-800 text-xs py-2"
             onClick={() => setIsLoginForm((value) => !value)}
           >
             {isLoginForm
-              ? "New User Signup here"
-              : "Existing User Logged in here"}
+              ? "New User? Sign up here"
+              : "Already a user? Log in here"}
           </p>
         </div>
       </div>

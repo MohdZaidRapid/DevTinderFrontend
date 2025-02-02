@@ -114,7 +114,7 @@ const EditProfile = ({ user }) => {
         )}
       </div>
 
-      <UserCard user={{ firstName, lastName, photoUrl, age, gender, about }} />
+      <UserCard user={user} showActions={{ interested: false, ignore: false, block: false }} />
     </div>
   );
 };

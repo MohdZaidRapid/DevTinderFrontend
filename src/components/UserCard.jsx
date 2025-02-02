@@ -4,7 +4,7 @@ import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
 
-const UserCard = ({ user, currentIndex }) => {
+const UserCard = ({ user, currentIndex, showActions = { interested: true, ignore: true, block: true } }) => {
   const { _id, firstName, lastName, photoUrl, gender, age, about } = user;
   const [message, setMessage] = useState("");
   const [isMessage, setIsMessage] = useState(false);
@@ -56,27 +56,35 @@ const UserCard = ({ user, currentIndex }) => {
         <h2 className="card-title">{`${firstName} ${lastName}`}</h2>
         {age && gender && <p>{`${age}, ${gender}`}</p>}
         <p>{about}</p>
+
         <div className="card-actions justify-center my-4">
-          <button
-            className="btn btn-primary"
-            onClick={() => handleSentRequest("ignored", _id)}
-          >
-            Ignore
-          </button>
-          <button
-            className="btn btn-secondary"
-            onClick={() => handleSentRequest("interested", _id)}
-          >
-            Interested
-          </button>
-          <button
-            className="btn btn-secondary"
-            onClick={() => handleBlockUser(_id)}
-          >
-            Block User
-          </button>
+          {showActions.ignore && (
+            <button
+              className="btn btn-primary"
+              onClick={() => handleSentRequest("ignored", _id)}
+            >
+              Ignore
+            </button>
+          )}
+          {showActions.interested && (
+            <button
+              className="btn btn-secondary"
+              onClick={() => handleSentRequest("interested", _id)}
+            >
+              Interested
+            </button>
+          )}
+          {showActions.block && (
+            <button
+              className="btn btn-error"
+              onClick={() => handleBlockUser(_id)}
+            >
+              Block User
+            </button>
+          )}
         </div>
       </div>
+
       {isMessage && (
         <div className="toast toast-top toast-center">
           <div className="alert alert-success">
@@ -84,6 +92,7 @@ const UserCard = ({ user, currentIndex }) => {
           </div>
         </div>
       )}
+
       {isError && (
         <div className="toast toast-top toast-center">
           <div className="alert alert-error">

@@ -13,6 +13,7 @@ import Chat from "./components/Chat";
 import BlockedUser from "./components/BlockedUser";
 import WithRoleAuth from "./components/WithRoleAuth"; // Capitalized HOC
 import Example from "./components/Example"; // Capitalized Component
+import AdminDashboard from "./components/AdminDashboard";
 
 function App() {
   return (
@@ -34,6 +35,15 @@ function App() {
               path="/example"
               element={
                 <WithRoleAuth WrappedComponent={Example} requiredRole="admin" />
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <WithRoleAuth
+                  WrappedComponent={AdminDashboard}
+                  requiredRole="admin"
+                />
               }
             />
           </Route>
