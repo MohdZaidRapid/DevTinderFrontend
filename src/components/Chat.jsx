@@ -109,7 +109,9 @@ const Chat = () => {
             return (
               <div
                 key={index}
-                className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}
+                className={`flex ${
+                  isCurrentUser ? "justify-end" : "justify-start"
+                }`}
               >
                 <div
                   className={`max-w-xs p-4 rounded-lg shadow-md ${

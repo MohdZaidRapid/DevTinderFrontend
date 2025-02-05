@@ -16,6 +16,7 @@ import Example from "./components/Example"; // Capitalized Component
 import AdminDashboard from "./components/AdminDashboard";
 import CheckBlockStatus from "./components/CheckBlockStatus";
 import Blocked from "./components/Blocked";
+import VideoCall from "./components/VideoCall";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
             <Route path="/chat/:targetUserId" element={<Chat />} />
             <Route path="/block/user" element={<BlockedUser />} />
             <Route path="/blocked" element={<Blocked />} />
+            <Route path="/video/:targetUserId" element={<VideoCall />} />
 
             {/* Admin Routes Protected by HOC */}
             <Route

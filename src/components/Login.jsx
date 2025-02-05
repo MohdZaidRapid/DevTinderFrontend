@@ -27,7 +27,10 @@ const Login = () => {
       );
 
       dispatch(addUser(res.data.user));
-      return navigate("/");
+
+      navigate("/"); // Redirect after login
+
+      // return navigate("/");
     } catch (error) {
       setError(error?.response?.data || "Something went wrong");
     }
@@ -64,7 +67,9 @@ const Login = () => {
             {!isLoginForm && (
               <>
                 <label className="form-control w-full my-1">
-                  <span className="label-text text-indigo-600 text-sm">First Name</span>
+                  <span className="label-text text-indigo-600 text-sm">
+                    First Name
+                  </span>
                   <input
                     type="text"
                     value={firstName}
@@ -73,7 +78,9 @@ const Login = () => {
                   />
                 </label>
                 <label className="form-control w-full my-1">
-                  <span className="label-text text-indigo-600 text-sm">Last Name</span>
+                  <span className="label-text text-indigo-600 text-sm">
+                    Last Name
+                  </span>
                   <input
                     type="text"
                     value={lastName}
@@ -85,7 +92,9 @@ const Login = () => {
             )}
 
             <label className="form-control w-full my-1">
-              <span className="label-text text-indigo-600 text-sm">Email Id</span>
+              <span className="label-text text-indigo-600 text-sm">
+                Email Id
+              </span>
               <input
                 type="text"
                 value={emailId}
@@ -94,7 +103,9 @@ const Login = () => {
               />
             </label>
             <label className="form-control w-full my-1">
-              <span className="label-text text-indigo-600 text-sm">Password</span>
+              <span className="label-text text-indigo-600 text-sm">
+                Password
+              </span>
               <input
                 type="password"
                 value={password}

@@ -4,7 +4,11 @@ import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
 
-const UserCard = ({ user, currentIndex, showActions = { interested: true, ignore: true, block: true } }) => {
+const UserCard = ({
+  user,
+  currentIndex,
+  showActions = { interested: true, ignore: true, block: true },
+}) => {
   const { _id, firstName, lastName, photoUrl, gender, age, about } = user;
   const [message, setMessage] = useState("");
   const [isMessage, setIsMessage] = useState(false);
