@@ -44,10 +44,10 @@ const NavBar = () => {
                 tabIndex={0}
                 className="menu menu-sm dropdown-content bg-gray-800 text-white rounded-box z-50 mt-3 w-52 p-2 shadow-xl"
                 style={{
-                  position: "absolute", 
+                  position: "absolute",
                   top: "100%", // Ensure it opens below the avatar
                   left: "50%", // Align with the center of the avatar
-                  transform: "translateX(-50%)" // Center horizontally
+                  transform: "translateX(-50%)", // Center horizontally
                 }}
               >
                 <li className="hover:bg-gray-700 rounded p-2">
@@ -65,6 +65,13 @@ const NavBar = () => {
                 <li className="hover:bg-gray-700 rounded p-2">
                   <Link to="/block/user">Block Users</Link>
                 </li>
+                {user && user.role === "admin" ? (
+                  <li className="hover:bg-gray-700 rounded p-2">
+                    <Link to="/admin">Admin</Link>
+                  </li>
+                ) : (
+                  ""
+                )}
                 <li className="hover:bg-gray-700 rounded p-2">
                   <a onClick={handleLogout}>Logout</a>
                 </li>
