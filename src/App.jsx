@@ -17,6 +17,7 @@ import AdminDashboard from "./components/AdminDashboard";
 import CheckBlockStatus from "./components/CheckBlockStatus";
 import Blocked from "./components/Blocked";
 import VideoCall from "./components/VideoCall";
+import PostContainer from "./components/PostContainer";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
             <Route path="/block/user" element={<BlockedUser />} />
             <Route path="/blocked" element={<Blocked />} />
             <Route path="/video/:targetUserId" element={<VideoCall />} />
+            <Route path="/posts" element={<PostContainer />} />
 
             {/* Admin Routes Protected by HOC */}
             <Route

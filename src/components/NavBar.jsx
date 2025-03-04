@@ -45,11 +45,14 @@ const NavBar = () => {
                 className="menu menu-sm dropdown-content bg-gray-800 text-white rounded-box z-50 mt-3 w-52 p-2 shadow-xl"
                 style={{
                   position: "absolute",
-                  top: "100%", // Ensure it opens below the avatar
-                  left: "50%", // Align with the center of the avatar
-                  transform: "translateX(-50%)", // Center horizontally
+                  top: "100%", 
+                  left: "50%", 
+                  transform: "translateX(-50%)", 
                 }}
               >
+                <li className="hover:bg-gray-700 rounded p-2">
+                  <Link to="/posts">Posts</Link>  {/* ✅ Added link to PostContainer */}
+                </li>
                 <li className="hover:bg-gray-700 rounded p-2">
                   <Link to="/connections">Connections</Link>
                 </li>
@@ -69,9 +72,7 @@ const NavBar = () => {
                   <li className="hover:bg-gray-700 rounded p-2">
                     <Link to="/admin">Admin</Link>
                   </li>
-                ) : (
-                  ""
-                )}
+                ) : null}
                 <li className="hover:bg-gray-700 rounded p-2">
                   <a onClick={handleLogout}>Logout</a>
                 </li>
