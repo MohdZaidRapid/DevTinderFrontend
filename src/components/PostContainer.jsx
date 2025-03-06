@@ -71,7 +71,7 @@ const PostContainer = () => {
         onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
         onMouseOut={(e) => (e.target.style.backgroundColor = "#007bff")}
       >
-        {fetchConnectionsOnly ? "Show All Posts" : "Show Connections' Posts"}
+        {fetchConnectionsOnly ? "Show All Posts" : "Show Connections Posts"}
       </button>
 
       <Posts posts={posts} likePost={likePost} createPost={createPost} />

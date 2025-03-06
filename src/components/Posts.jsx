@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Comments from "../components/Comments";
 
 const Posts = ({ posts, likePost, createPost }) => {
   const [content, setContent] = useState("");
@@ -44,7 +45,6 @@ const Posts = ({ posts, likePost, createPost }) => {
             <p className="text-gray-600 mt-2">{post.content}</p>
             {post.imageUrl && (
               <img
-              
                 src={post.imageUrl}
                 alt="Post"
                 className="w-28 mt-3 rounded-lg shadow-sm"
@@ -56,6 +56,9 @@ const Posts = ({ posts, likePost, createPost }) => {
             >
               ❤️ Like ({post.likes?.length})
             </button>
+
+            {/* Comments Section */}
+            <Comments postId={post._id} />
           </div>
         ))}
       </div>
