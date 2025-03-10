@@ -19,6 +19,7 @@ import CheckBlockStatus from "./components/CheckBlockStatus";
 import Blocked from "./components/Blocked";
 import VideoCall from "./components/VideoCall";
 import PostContainer from "./components/PostContainer";
+import EncryptedChat from "./components/EncryptedChat";
 
 function SyncUserWithLocalStorage() {
   const dispatch = useDispatch();
@@ -52,6 +53,7 @@ function App() {
             <Route path="/blocked" element={<Blocked />} />
             <Route path="/video/:targetUserId" element={<VideoCall />} />
             <Route path="/posts" element={<PostContainer />} />
+            <Route path="/encrypted-chat/:targetUserId" element={<EncryptedChat />} />
 
             {/* Admin Routes Protected by HOC */}
             <Route

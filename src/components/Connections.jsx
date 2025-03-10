@@ -58,8 +58,8 @@ const Connections = () => {
             <Link to={"/chat/" + _id}>
               <button className="btn btn-primary">Chat</button>
             </Link>
-            <Link to={"/video/" + _id}>
-              <button className="btn btn-primary">Video</button>
+            <Link to={"/encrypted-chat/" + _id}>
+              <button className="btn btn-primary">Private chat</button>
             </Link>
           </div>
         );

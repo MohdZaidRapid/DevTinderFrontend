@@ -51,8 +51,7 @@ const NavBar = () => {
                 }}
               >
                 <li className="hover:bg-gray-700 rounded p-2">
-                  <Link to="/posts">Posts</Link>{" "}
-                  {/* ✅ Added link to PostContainer */}
+                  <Link to="/posts">Posts</Link>
                 </li>
                 <li className="hover:bg-gray-700 rounded p-2">
                   <Link to="/connections">Connections</Link>
