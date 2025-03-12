@@ -20,6 +20,8 @@ import Blocked from "./components/Blocked";
 import VideoCall from "./components/VideoCall";
 import PostContainer from "./components/PostContainer";
 import EncryptedChat from "./components/EncryptedChat";
+import BuyPost from "./components/BuyPost"; // Added BuyPost Component
+import OwnerPosts from "./components/OwnerPosts";
 
 function SyncUserWithLocalStorage() {
   const dispatch = useDispatch();
@@ -53,8 +55,13 @@ function App() {
             <Route path="/blocked" element={<Blocked />} />
             <Route path="/video/:targetUserId" element={<VideoCall />} />
             <Route path="/posts" element={<PostContainer />} />
-            <Route path="/encrypted-chat/:targetUserId" element={<EncryptedChat />} />
-
+            <Route path="/ownerposts" element={<OwnerPosts />} />
+            <Route
+              path="/encrypted-chat/:targetUserId"
+              element={<EncryptedChat />}
+            />
+            <Route path="/buy-post/:postId" element={<BuyPost />} />{" "}
+            {/* Added BuyPost Route */}
             {/* Admin Routes Protected by HOC */}
             <Route
               path="/example"

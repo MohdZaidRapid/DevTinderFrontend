@@ -24,12 +24,17 @@ const PostContainer = () => {
     }
   };
 
-  const createPost = async (content, imageUrl) => {
+  const createPost = async (content, imageUrl, price) => {
     if (!content) return;
     try {
       await axios.post(
         BASE_URL + "/posts",
-        { content, imageUrl },
+        {
+          content,
+          imageUrl,
+          price,
+          isForSale: !!price, // Set isForSale to true if price exists
+        },
         { withCredentials: true }
       );
       fetchPosts();
