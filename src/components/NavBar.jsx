@@ -9,13 +9,15 @@ const NavBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
+  const handleLogout = async (dispatch) => {
     try {
-      await axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
-      dispatch(removeUser());
-      return navigate("/login");
+      await axios.post(`${BASE_URL}/logout`, {}, { withCredentials: true });
+
+      localStorage.removeItem("user"); // Clear localStorage
+      dispatch(removeUser()); // Remove from Redux store
+      navigate("/login");
     } catch (error) {
-      console.log(error);
+      console.error("Logout failed:", error.response?.data || error.message);
     }
   };
 
@@ -74,7 +76,9 @@ const NavBar = () => {
                   </li>
                 ) : null}
                 <li className="hover:bg-gray-700 rounded p-2">
-                  <a onClick={handleLogout}>Logout</a>
+                  <button onClick={() => handleLogout(dispatch, navigate)}>
+                    Logout
+                  </button>
                 </li>
               </ul>
             </div>
