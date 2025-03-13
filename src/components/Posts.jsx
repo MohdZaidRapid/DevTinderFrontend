@@ -51,7 +51,7 @@ const Posts = ({ posts, likePost, createPost }) => {
               {post.currentOwner?.lastName}
             </h4>
             <p className="text-sm text-gray-500">
-              Created by: {post.createdBy.firstName} {post.createdBy.lastName}
+              Created by: {post?.createdBy?.firstName} {post?.createdBy?.lastName}
             </p>
             <p className="text-gray-600 mt-2">{post.content}</p>
             {post.imageUrl && (
