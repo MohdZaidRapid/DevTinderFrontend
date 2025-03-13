@@ -11,19 +11,22 @@ const Feed = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    const fetchFeed = async () => {
-      try {
-        const res = await axios.get(BASE_URL + "/feed", {
-          withCredentials: true,
-        });
-        dispatch(addFeed(res.data)); // Update feed in Redux store
-      } catch (error) {
-        console.error("Error fetching feed:", error);
-      }
-    };
+    if (feed.length === 0) {
+      const fetchFeed = async () => {
+        try {
+          const res = await axios.get(BASE_URL + "/feed", {
+            withCredentials: true,
+          });
+          dispatch(addFeed(res.data));
+        } catch (error) {
+          console.error("Error fetching feed:", error);
+        }
+      };
 
-    fetchFeed(); // Always fetch feed when the component mounts
-  }, [dispatch, feed]); // Dependency ensures it runs once on mount
+      fetchFeed();
+    }
+  }, [dispatch, feed.length]); // ✅ Only fetch if feed is empty
+  // Dependency ensures it runs once on mount
 
   if (!feed.length) {
     return (
