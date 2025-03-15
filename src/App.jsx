@@ -22,6 +22,8 @@ import PostContainer from "./components/PostContainer";
 import EncryptedChat from "./components/EncryptedChat";
 import BuyPost from "./components/BuyPost"; // Added BuyPost Component
 import OwnerPosts from "./components/OwnerPosts";
+import ChatRooms from "./components/ChatRooms";
+import ChatRoom from "./components/ChatRoom";
 
 function SyncUserWithLocalStorage() {
   const dispatch = useDispatch();
@@ -56,6 +58,8 @@ function App() {
             <Route path="/video/:targetUserId" element={<VideoCall />} />
             <Route path="/posts" element={<PostContainer />} />
             <Route path="/ownerposts" element={<OwnerPosts />} />
+            <Route path="/chatrooms" element={<ChatRooms />} />
+            <Route path="/chatroom/:roomId" element={<ChatRoom />} />
             <Route
               path="/encrypted-chat/:targetUserId"
               element={<EncryptedChat />}

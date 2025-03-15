@@ -9,7 +9,7 @@ const NavBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogout = async (dispatch) => {
+  const handleLogout = async () => {
     try {
       await axios.post(`${BASE_URL}/logout`, {}, { withCredentials: true });
 
@@ -70,15 +70,20 @@ const NavBar = () => {
                 <li className="hover:bg-gray-700 rounded p-2">
                   <Link to="/block/user">Block Users</Link>
                 </li>
-                {user && user.role === "admin" ? (
+                {user?.role === "admin" && (
                   <li className="hover:bg-gray-700 rounded p-2">
                     <Link to="/admin">Admin</Link>
                   </li>
-                ) : null}
+                )}
+                {/* ✅ Added New Buttons */}
                 <li className="hover:bg-gray-700 rounded p-2">
-                  <button onClick={() => handleLogout(dispatch, navigate)}>
-                    Logout
-                  </button>
+                  <Link to="/ownerposts">Owner Posts</Link>
+                </li>
+                <li className="hover:bg-gray-700 rounded p-2">
+                  <Link to="/chatrooms">Chat Rooms</Link>
+                </li>
+                <li className="hover:bg-gray-700 rounded p-2">
+                  <button onClick={handleLogout}>Logout</button>
                 </li>
               </ul>
             </div>
