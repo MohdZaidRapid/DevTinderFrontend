@@ -11,33 +11,52 @@ const ChatRoom = () => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
+  const [password, setPassword] = useState(""); // ✅ Store password input
+  const [joined, setJoined] = useState(false); // ✅ Track if user has joined
+  const [error, setError] = useState(null); // ✅ Error handling
+
   const socket = createSocketConnection();
 
-  // ✅ Fetch messages from API when the component mounts
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         const response = await axios.get(
-          `${BASE_URL}/api/chatrooms/${roomId}/messages`
+          `${BASE_URL}/api/chatrooms/${roomId}/messages`,
+          { withCredentials: true }
         );
-        setMessages(response.data); // ✅ Store messages in state
+        setMessages(response.data);
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
     };
 
-    fetchMessages(); // Call API when component mounts
+    if (joined) {
+      fetchMessages();
 
-    socket.emit("joinRoom", { roomId, userId: user._id });
+      socket.emit("joinRoom", { roomId, userId: user._id });
 
-    socket.on("roomMessageReceived", (newMessage) => {
-      setMessages((prev) => [...prev, newMessage]); // ✅ Update state in real-time
+      socket.on("roomMessageReceived", (newMessage) => {
+        setMessages((prev) => [...prev, newMessage]);
+      });
+
+      return () => {
+        socket.off("roomMessageReceived");
+      };
+    }
+  }, [roomId, user._id, joined]);
+
+  const joinRoom = () => {
+    socket.emit("joinRoom", { roomId, userId: user._id, password });
+
+    socket.on("joinedRoom", () => {
+      setJoined(true);
+      setError(null); // ✅ Clear errors on success
     });
 
-    return () => {
-      socket.off("roomMessageReceived");
-    };
-  }, [roomId, user._id]);
+    socket.on("error", (errMsg) => {
+      setError(errMsg);
+    });
+  };
 
   const sendMessage = async () => {
     if (!message.trim() && !selectedFile) return;
@@ -48,7 +67,7 @@ const ChatRoom = () => {
       const reader = new FileReader();
       reader.readAsDataURL(selectedFile);
       reader.onload = () => {
-        const base64String = reader.result.split(",")[1]; // Remove metadata prefix
+        const base64String = reader.result.split(",")[1];
         fileData = {
           name: selectedFile.name,
           type: selectedFile.type,
@@ -81,73 +100,95 @@ const ChatRoom = () => {
     <div className="p-4">
       <h2 className="text-xl font-bold">Chat Room</h2>
 
-      {/* Messages Display */}
-      <div className="border p-4 h-64 overflow-y-scroll mb-2">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`p-2 ${
-              msg.senderId === user._id ? "text-right" : "text-left"
-            }`}
-          >
-            <span className="bg-gray-200 p-1 rounded">{msg.text}</span>
-
-            {/* Display Image */}
-            {msg.fileUrl &&
-              (msg.fileType.startsWith("image/") ? (
-                <img
-                  src={`${BASE_URL}${msg.fileUrl}`}
-                  alt="Uploaded file"
-                  className="w-40 mt-2 rounded"
-                />
-              ) : (
-                <a
-                  href={`${BASE_URL}${msg.fileUrl}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-blue-500 mt-2"
-                >
-                  Download File
-                </a>
-              ))}
-          </div>
-        ))}
-      </div>
-
-      {/* Message Input and File Upload */}
-      <div className="flex items-center space-x-2">
-        <input
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type a message..."
-          className="flex-1 p-2 border rounded"
-        />
-
-        {/* File Upload Input */}
-        <input
-          type="file"
-          onChange={(e) => setSelectedFile(e.target.files[0])}
-          className="p-2 border rounded"
-        />
-
-        {/* Preview Selected File */}
-        {selectedFile && selectedFile.type.startsWith("image/") && (
-          <img
-            src={URL.createObjectURL(selectedFile)}
-            alt="Preview"
-            className="w-10 h-10 object-cover rounded"
+      {!joined ? (
+        <div className="mt-4">
+          <p>Enter room password:</p>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Room password..."
+            className="p-2 border rounded w-full"
           />
-        )}
+          <button
+            onClick={joinRoom}
+            className="mt-2 p-2 bg-blue-500 text-white rounded w-full"
+          >
+            Join Room
+          </button>
+          {error && <p className="text-red-500 mt-2">{error}</p>}
+        </div>
+      ) : (
+        <>
+          {/* Messages Display */}
+          <div className="border p-4 h-64 overflow-y-scroll mb-2">
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`p-2 ${
+                  msg.senderId === user._id ? "text-right" : "text-left"
+                }`}
+              >
+                <span className="bg-gray-200 p-1 rounded">{msg.text}</span>
 
-        {/* Send Button */}
-        <button
-          onClick={sendMessage}
-          className="p-2 bg-blue-500 text-white rounded"
-        >
-          Send
-        </button>
-      </div>
+                {/* Display Image */}
+                {msg.fileUrl &&
+                  (msg.fileType.startsWith("image/") ? (
+                    <img
+                      src={`${BASE_URL}${msg.fileUrl}`}
+                      alt="Uploaded file"
+                      className="w-40 mt-2 rounded"
+                    />
+                  ) : (
+                    <a
+                      href={`${BASE_URL}${msg.fileUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-blue-500 mt-2"
+                    >
+                      Download File
+                    </a>
+                  ))}
+              </div>
+            ))}
+          </div>
+
+          {/* Message Input and File Upload */}
+          <div className="flex items-center space-x-2">
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Type a message..."
+              className="flex-1 p-2 border rounded"
+            />
+
+            {/* File Upload Input */}
+            <input
+              type="file"
+              onChange={(e) => setSelectedFile(e.target.files[0])}
+              className="p-2 border rounded"
+            />
+
+            {/* Preview Selected File */}
+            {selectedFile && selectedFile.type.startsWith("image/") && (
+              <img
+                src={URL.createObjectURL(selectedFile)}
+                alt="Preview"
+                className="w-10 h-10 object-cover rounded"
+              />
+            )}
+
+            {/* Send Button */}
+            <button
+              onClick={sendMessage}
+              className="p-2 bg-blue-500 text-white rounded"
+            >
+              Send
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

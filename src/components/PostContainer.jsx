@@ -17,7 +17,6 @@ const PostContainer = () => {
       const response = await axios.get(`${BASE_URL}${endpoint}`, {
         withCredentials: true,
       });
-      console.log(response.data?.data);
       setPosts(response.data?.data);
     } catch (error) {
       console.error("Error fetching posts:", error);
