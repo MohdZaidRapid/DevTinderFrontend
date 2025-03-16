@@ -5,35 +5,33 @@ import { createSocketConnection } from "../utils/socket";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 
-// const socket = io("http://localhost:5000");
-
 const ChatRoom = () => {
   const { roomId } = useParams();
   const user = useSelector((state) => state.user);
-
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
   const socket = createSocketConnection();
+
+  // ✅ Fetch messages from API when the component mounts
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         const response = await axios.get(
-          `${BASE_URL}/api/chatrooms/${roomId}/messages`,
-          { withCredentials: true }
+          `${BASE_URL}/api/chatrooms/${roomId}/messages`
         );
-        console.log(response?.data);
-        setMessages(response.data);
+        setMessages(response.data); // ✅ Store messages in state
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
     };
 
-    fetchMessages(); // Fetch chat history when joining the room
+    fetchMessages(); // Call API when component mounts
 
     socket.emit("joinRoom", { roomId, userId: user._id });
 
     socket.on("roomMessageReceived", (newMessage) => {
-      setMessages((prev) => [...prev, newMessage]);
+      setMessages((prev) => [...prev, newMessage]); // ✅ Update state in real-time
     });
 
     return () => {
@@ -42,31 +40,48 @@ const ChatRoom = () => {
   }, [roomId, user._id]);
 
   const sendMessage = async () => {
-    if (!message.trim()) return;
+    if (!message.trim() && !selectedFile) return;
 
-    const newMessage = {
-      userId: user._id,
-      text: message,
-      roomId,
-    };
+    let fileData = null;
 
-    socket.emit("sendRoomMessage", newMessage);
-    setMessage("");
+    if (selectedFile) {
+      const reader = new FileReader();
+      reader.readAsDataURL(selectedFile);
+      reader.onload = () => {
+        const base64String = reader.result.split(",")[1]; // Remove metadata prefix
+        fileData = {
+          name: selectedFile.name,
+          type: selectedFile.type,
+          data: base64String,
+        };
 
-    try {
-      await axios.post(
-        `${BASE_URL}/api/chatrooms/${roomId}/message`,
-        { text: message, userId: user._id },
-        { withCredentials: true }
-      );
-    } catch (error) {
-      console.error("Error sending message:", error);
+        socket.emit("sendRoomMessage", {
+          userId: user._id,
+          roomId,
+          text: message,
+          file: fileData,
+        });
+
+        setMessage("");
+        setSelectedFile(null);
+      };
+    } else {
+      socket.emit("sendRoomMessage", {
+        userId: user._id,
+        roomId,
+        text: message,
+        file: null,
+      });
+
+      setMessage("");
     }
   };
 
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold">Chat Room</h2>
+
+      {/* Messages Display */}
       <div className="border p-4 h-64 overflow-y-scroll mb-2">
         {messages.map((msg, index) => (
           <div
@@ -76,10 +91,31 @@ const ChatRoom = () => {
             }`}
           >
             <span className="bg-gray-200 p-1 rounded">{msg.text}</span>
+
+            {/* Display Image */}
+            {msg.fileUrl &&
+              (msg.fileType.startsWith("image/") ? (
+                <img
+                  src={`${BASE_URL}${msg.fileUrl}`}
+                  alt="Uploaded file"
+                  className="w-40 mt-2 rounded"
+                />
+              ) : (
+                <a
+                  href={`${BASE_URL}${msg.fileUrl}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-blue-500 mt-2"
+                >
+                  Download File
+                </a>
+              ))}
           </div>
         ))}
       </div>
-      <div className="flex">
+
+      {/* Message Input and File Upload */}
+      <div className="flex items-center space-x-2">
         <input
           type="text"
           value={message}
@@ -87,9 +123,27 @@ const ChatRoom = () => {
           placeholder="Type a message..."
           className="flex-1 p-2 border rounded"
         />
+
+        {/* File Upload Input */}
+        <input
+          type="file"
+          onChange={(e) => setSelectedFile(e.target.files[0])}
+          className="p-2 border rounded"
+        />
+
+        {/* Preview Selected File */}
+        {selectedFile && selectedFile.type.startsWith("image/") && (
+          <img
+            src={URL.createObjectURL(selectedFile)}
+            alt="Preview"
+            className="w-10 h-10 object-cover rounded"
+          />
+        )}
+
+        {/* Send Button */}
         <button
           onClick={sendMessage}
-          className="ml-2 p-2 bg-blue-500 text-white rounded"
+          className="p-2 bg-blue-500 text-white rounded"
         >
           Send
         </button>
