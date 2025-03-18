@@ -11,12 +11,32 @@ const ChatRoom = () => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
-  const [password, setPassword] = useState(""); // ✅ Store password input
-  const [joined, setJoined] = useState(false); // ✅ Track if user has joined
-  const [error, setError] = useState(null); // ✅ Error handling
+  const [password, setPassword] = useState(""); // Store password input
+  const [joined, setJoined] = useState(false); // Track if user has joined
+  const [error, setError] = useState(null); // Error handling
 
   const socket = createSocketConnection();
 
+  // Check membership on mount
+  useEffect(() => {
+    const checkMembership = async () => {
+      try {
+        const response = await axios.get(
+          `${BASE_URL}/api/chatrooms/${roomId}`,
+          { withCredentials: true }
+        );
+        // If the room's users array includes the current user, mark as joined.
+        if (response.data.users && response.data.users.includes(user._id)) {
+          setJoined(true);
+        }
+      } catch (err) {
+        console.error("Error checking membership:", err);
+      }
+    };
+    checkMembership();
+  }, [roomId, user._id]);
+
+  // Fetch messages and set up socket listeners only after joining
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -32,27 +52,23 @@ const ChatRoom = () => {
 
     if (joined) {
       fetchMessages();
-
       socket.emit("joinRoom", { roomId, userId: user._id });
-
       socket.on("roomMessageReceived", (newMessage) => {
         setMessages((prev) => [...prev, newMessage]);
       });
-
       return () => {
         socket.off("roomMessageReceived");
       };
     }
-  }, [roomId, user._id, joined]);
+  }, [roomId, user._id, joined, socket]);
 
+  // Function to join the room if not already a member
   const joinRoom = () => {
     socket.emit("joinRoom", { roomId, userId: user._id, password });
-
     socket.on("joinedRoom", () => {
       setJoined(true);
-      setError(null); // ✅ Clear errors on success
+      setError(null); // Clear errors on success
     });
-
     socket.on("error", (errMsg) => {
       setError(errMsg);
     });
@@ -62,7 +78,6 @@ const ChatRoom = () => {
     if (!message.trim() && !selectedFile) return;
 
     let fileData = null;
-
     if (selectedFile) {
       const reader = new FileReader();
       reader.readAsDataURL(selectedFile);
@@ -73,14 +88,12 @@ const ChatRoom = () => {
           type: selectedFile.type,
           data: base64String,
         };
-
         socket.emit("sendRoomMessage", {
           userId: user._id,
           roomId,
           text: message,
           file: fileData,
         });
-
         setMessage("");
         setSelectedFile(null);
       };
@@ -91,7 +104,6 @@ const ChatRoom = () => {
         text: message,
         file: null,
       });
-
       setMessage("");
     }
   };
@@ -100,6 +112,7 @@ const ChatRoom = () => {
     <div className="p-4">
       <h2 className="text-xl font-bold">Chat Room</h2>
 
+      {/* If not joined, show join room prompt */}
       {!joined ? (
         <div className="mt-4">
           <p>Enter room password:</p>
@@ -120,7 +133,7 @@ const ChatRoom = () => {
         </div>
       ) : (
         <>
-          {/* Messages Display */}
+          {/* Chat Messages Display */}
           <div className="border p-4 h-64 overflow-y-scroll mb-2">
             {messages.map((msg, index) => (
               <div
@@ -130,8 +143,6 @@ const ChatRoom = () => {
                 }`}
               >
                 <span className="bg-gray-200 p-1 rounded">{msg.text}</span>
-
-                {/* Display Image */}
                 {msg.fileUrl &&
                   (msg.fileType.startsWith("image/") ? (
                     <img
@@ -153,7 +164,7 @@ const ChatRoom = () => {
             ))}
           </div>
 
-          {/* Message Input and File Upload */}
+          {/* Message Input & File Upload */}
           <div className="flex items-center space-x-2">
             <input
               type="text"
@@ -162,15 +173,11 @@ const ChatRoom = () => {
               placeholder="Type a message..."
               className="flex-1 p-2 border rounded"
             />
-
-            {/* File Upload Input */}
             <input
               type="file"
               onChange={(e) => setSelectedFile(e.target.files[0])}
               className="p-2 border rounded"
             />
-
-            {/* Preview Selected File */}
             {selectedFile && selectedFile.type.startsWith("image/") && (
               <img
                 src={URL.createObjectURL(selectedFile)}
@@ -178,8 +185,6 @@ const ChatRoom = () => {
                 className="w-10 h-10 object-cover rounded"
               />
             )}
-
-            {/* Send Button */}
             <button
               onClick={sendMessage}
               className="p-2 bg-blue-500 text-white rounded"

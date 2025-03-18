@@ -8,8 +8,6 @@ const ChatRooms = () => {
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
   const [chatRooms, setChatRooms] = useState([]);
-  const [roomName, setRoomName] = useState("");
-  const [password, setPassword] = useState("");
   const [passwords, setPasswords] = useState({});
   const [selectedRoom, setSelectedRoom] = useState(null);
 
@@ -28,137 +26,93 @@ const ChatRooms = () => {
     }
   };
 
-  const handleJoinRoom = async (roomId) => {
-    const storedPassword = localStorage.getItem(`roomPassword_${roomId}`);
+  const handleJoinRoom = (room) => {
+    // Use an empty array if room.users is undefined.
+    const usersInRoom = room.users || [];
+    const isMember = usersInRoom.includes(user._id);
 
-    if (storedPassword) {
-      // If password is stored, try joining directly
-      await submitJoinRoom(roomId, storedPassword);
+    if (isMember) {
+      // If user is already a member, redirect immediately.
+      navigate(`/chatroom/${room._id}`);
     } else {
-      // If no password is stored, prompt user for input
-      setSelectedRoom(roomId);
+      // Otherwise, show password input.
+      setSelectedRoom(room._id);
+      setPasswords((prev) => ({ ...prev, [room._id]: "" }));
     }
   };
 
-  const submitJoinRoom = async (roomId, passwordInput) => {
-    const roomPassword = passwordInput || passwords[roomId] || "";
-
-    if (!roomPassword) {
+  const submitJoinRoom = async (roomId) => {
+    const roomPassword = passwords[roomId] || "";
+    if (!roomPassword.trim()) {
       alert("Please enter a password!");
       return;
     }
-
     try {
       const response = await axios.post(
         `${BASE_URL}/api/chatrooms/join/${roomId}`,
         { password: roomPassword },
         { withCredentials: true }
       );
-
-      if (
-        response.data.success ||
-        response.data.message === "Already joined the room"
-      ) {
-        // Store password only if joining was successful
-        localStorage.setItem(`roomPassword_${roomId}`, roomPassword);
-        navigate(`/chatroom/${roomId}`); // ✅ Redirect to the chat room
+      if (response.data.chatRoom) {
+        // On successful join, clear the selected room and redirect.
+        setSelectedRoom(null);
+        setPasswords((prev) => ({ ...prev, [roomId]: "" }));
+        navigate(`/chatroom/${roomId}`);
       } else {
         throw new Error("Invalid password.");
       }
     } catch (error) {
-      console.error("Error joining chat room:", error);
-      alert(
-        error.response?.data?.message ||
-          "Incorrect password or error joining room."
-      );
+      alert(error.response?.data?.error || "Incorrect password.");
       setPasswords((prev) => ({ ...prev, [roomId]: "" }));
-      localStorage.removeItem(`roomPassword_${roomId}`);
-    }
-  };
-
-  const handleCreateRoom = async () => {
-    if (!roomName.trim() || !password.trim()) return;
-
-    try {
-      await axios.post(
-        `${BASE_URL}/api/chatrooms/create`,
-        { name: roomName, password },
-        { withCredentials: true }
-      );
-      setRoomName("");
-      setPassword("");
-      fetchChatRooms();
-    } catch (error) {
-      console.error("Error creating chat room:", error);
     }
   };
 
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Chat Rooms</h2>
-
-      {user?.role === "admin" && (
-        <div className="mb-4">
-          <input
-            type="text"
-            value={roomName}
-            onChange={(e) => setRoomName(e.target.value)}
-            placeholder="Enter room name"
-            className="p-2 border rounded mr-2"
-          />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter room password"
-            className="p-2 border rounded mr-2"
-          />
-          <button
-            onClick={handleCreateRoom}
-            className="p-2 bg-blue-500 text-white rounded"
-          >
-            Create Room
-          </button>
-        </div>
-      )}
-
       <ul>
-        {chatRooms.map((room) => (
-          <li key={room._id} className="mb-2 p-2 border rounded flex flex-col">
-            <div className="flex justify-between items-center">
-              <span>{room.name}</span>
-              <button
-                onClick={() => handleJoinRoom(room._id)}
-                className="p-2 bg-green-500 text-white rounded"
-              >
-                Join
-              </button>
-            </div>
-
-            {selectedRoom === room._id && (
-              <div className="mt-2">
-                <input
-                  type="password"
-                  value={passwords[room._id] || ""}
-                  onChange={(e) =>
-                    setPasswords((prev) => ({
-                      ...prev,
-                      [room._id]: e.target.value,
-                    }))
-                  }
-                  placeholder="Enter room password"
-                  className="p-2 border rounded w-full"
-                />
+        {chatRooms.map((room) => {
+          const isMember = (room.users || []).includes(user._id);
+          return (
+            <li
+              key={room._id}
+              className="mb-2 p-2 border rounded flex flex-col"
+            >
+              <div className="flex justify-between items-center">
+                <span>{room.name}</span>
                 <button
-                  onClick={() => submitJoinRoom(room._id)}
-                  className="p-2 bg-blue-500 text-white rounded mt-2 w-full"
+                  onClick={() => handleJoinRoom(room)}
+                  className="p-2 bg-green-500 text-white rounded"
                 >
-                  Enter Room
+                  {isMember ? "Open Chat Room" : "Join"}
                 </button>
               </div>
-            )}
-          </li>
-        ))}
+              {/* Only show password input if user is not a member */}
+              {selectedRoom === room._id && !isMember && (
+                <div className="mt-2">
+                  <input
+                    type="password"
+                    value={passwords[room._id] || ""}
+                    onChange={(e) =>
+                      setPasswords((prev) => ({
+                        ...prev,
+                        [room._id]: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter room password"
+                    className="p-2 border rounded w-full"
+                  />
+                  <button
+                    onClick={() => submitJoinRoom(room._id)}
+                    className="p-2 bg-blue-500 text-white rounded mt-2 w-full"
+                  >
+                    Enter Room
+                  </button>
+                </div>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
