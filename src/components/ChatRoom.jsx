@@ -18,23 +18,23 @@ const ChatRoom = () => {
   const socket = createSocketConnection();
 
   // Check membership on mount
-  useEffect(() => {
-    const checkMembership = async () => {
-      try {
-        const response = await axios.get(
-          `${BASE_URL}/api/chatrooms/${roomId}`,
-          { withCredentials: true }
-        );
-        // If the room's users array includes the current user, mark as joined.
-        if (response.data.users && response.data.users.includes(user._id)) {
-          setJoined(true);
-        }
-      } catch (err) {
-        console.error("Error checking membership:", err);
-      }
-    };
-    checkMembership();
-  }, [roomId, user._id]);
+  // useEffect(() => {
+  //   const checkMembership = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `${BASE_URL}/api/chatrooms/${roomId}`,
+  //         { withCredentials: true }
+  //       );
+  //       // If the room's users array includes the current user, mark as joined.
+  //       if (response.data.users && response.data.users.includes(user._id)) {
+  //         setJoined(true);
+  //       }
+  //     } catch (err) {
+  //       console.error("Error checking membership:", err);
+  //     }
+  //   };
+  //   checkMembership();
+  // }, [roomId, user._id]);
 
   // Fetch messages and set up socket listeners only after joining
   useEffect(() => {
@@ -60,7 +60,7 @@ const ChatRoom = () => {
         socket.off("roomMessageReceived");
       };
     }
-  }, [roomId, user._id, joined, socket]);
+  }, [roomId, user._id, joined]);
 
   // Function to join the room if not already a member
   const joinRoom = () => {
