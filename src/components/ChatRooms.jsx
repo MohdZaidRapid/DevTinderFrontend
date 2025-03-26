@@ -10,6 +10,8 @@ const ChatRooms = () => {
   const [chatRooms, setChatRooms] = useState([]);
   const [passwords, setPasswords] = useState({});
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [newRoomName, setNewRoomName] = useState("");
+  const [newRoomPassword, setNewRoomPassword] = useState("");
 
   useEffect(() => {
     fetchChatRooms();
@@ -26,35 +28,66 @@ const ChatRooms = () => {
     }
   };
 
+  const handleCreateRoom = async () => {
+    if (!newRoomName.trim() || !newRoomPassword.trim()) {
+      alert("Room name and password are required!");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/api/chatrooms/create`,
+        { name: newRoomName, password: newRoomPassword },
+        { withCredentials: true }
+      );
+
+      alert(response.data.message);
+      setNewRoomName("");
+      setNewRoomPassword("");
+      fetchChatRooms(); // Refresh the list
+    } catch (error) {
+      alert(error.response?.data?.error || "Failed to create chat room.");
+    }
+  };
+
+  /** Handle Join Room */
   const handleJoinRoom = (room) => {
-    // Use an empty array if room.users is undefined.
-    const usersInRoom = room.users || [];
-    const isMember = usersInRoom.includes(user._id);
+    if (!user || !user._id) {
+      alert("User not authenticated!");
+      return;
+    }
+
+    const isMember = (room.users || []).includes(user._id);
 
     if (isMember) {
-      // If user is already a member, redirect immediately.
       navigate(`/chatroom/${room._id}`);
     } else {
-      // Otherwise, show password input.
       setSelectedRoom(room._id);
       setPasswords((prev) => ({ ...prev, [room._id]: "" }));
     }
   };
 
+  /** Submit Join Room */
   const submitJoinRoom = async (roomId) => {
+    if (!user || !user._id) {
+      alert("User not authenticated!");
+      return;
+    }
+
     const roomPassword = passwords[roomId] || "";
     if (!roomPassword.trim()) {
       alert("Please enter a password!");
       return;
     }
+
     try {
       const response = await axios.post(
         `${BASE_URL}/api/chatrooms/join/${roomId}`,
         { password: roomPassword },
         { withCredentials: true }
       );
+
       if (response.data.chatRoom) {
-        // On successful join, clear the selected room and redirect.
         setSelectedRoom(null);
         setPasswords((prev) => ({ ...prev, [roomId]: "" }));
         navigate(`/chatroom/${roomId}`);
@@ -70,6 +103,34 @@ const ChatRooms = () => {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Chat Rooms</h2>
+
+      {/* Show Create Room form for Admins */}
+      {user.role === "admin" && (
+        <div className="mb-4 p-4 border rounded">
+          <h3 className="text-lg font-semibold mb-2">Create a New Room</h3>
+          <input
+            type="text"
+            placeholder="Room Name"
+            value={newRoomName}
+            onChange={(e) => setNewRoomName(e.target.value)}
+            className="p-2 border rounded w-full mb-2"
+          />
+          <input
+            type="password"
+            placeholder="Room Password"
+            value={newRoomPassword}
+            onChange={(e) => setNewRoomPassword(e.target.value)}
+            className="p-2 border rounded w-full mb-2"
+          />
+          <button
+            onClick={handleCreateRoom}
+            className="p-2 bg-blue-500 text-white rounded w-full"
+          >
+            Create Room
+          </button>
+        </div>
+      )}
+
       <ul>
         {chatRooms.map((room) => {
           const isMember = (room.users || []).includes(user._id);
@@ -87,7 +148,6 @@ const ChatRooms = () => {
                   {isMember ? "Open Chat Room" : "Join"}
                 </button>
               </div>
-              {/* Only show password input if user is not a member */}
               {selectedRoom === room._id && !isMember && (
                 <div className="mt-2">
                   <input
