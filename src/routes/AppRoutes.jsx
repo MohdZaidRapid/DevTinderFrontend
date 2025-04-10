@@ -8,6 +8,9 @@ import MyBooks from "../pages/MyBooks.jsx";
 import EditBook from "../pages/EditBook.jsx";
 import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import AddBook from "../pages/AddBook.jsx";
+import ChatPage from "../components/ChatPage.jsx";
+import InboxPage from "../pages/InboxPage.jsx";
+import NotificationsPage from "../pages/NotificationsPage.jsx";
 
 const AppRoutes = () => {
   return (
@@ -17,6 +20,9 @@ const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/books/:id" element={<BookDetails />} />
       <Route path="/profile/:id" element={<Profile />} />
+      <Route path="/chat/:chatId" element={<ChatPage />} />
+      <Route path="/inbox" element={<InboxPage />} />
+      <Route path="/notifications" element={<NotificationsPage />} />
 
       {/* ✅ Protected Routes wrapped correctly */}
       <Route

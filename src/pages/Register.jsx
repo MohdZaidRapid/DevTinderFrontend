@@ -24,7 +24,7 @@ const Register = () => {
     setSuccess("");
 
     try {
-      const res = await axios.post("api/auth/register", formData);
+      const res = await axios.post("/auth/register", formData);
       setSuccess(res.data.msg || "Registered successfully!");
     } catch (err) {
       setError(err.response?.data?.msg || "Something went wrong");

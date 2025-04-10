@@ -31,6 +31,17 @@ const Books = () => {
     }
   };
 
+  const handleChat = async (bookId) => {
+    try {
+      const res = await axios.post("/chat/start", { bookId });
+      const chatId = res.data._id;
+      navigate(`/chat/${chatId}`);
+    } catch (err) {
+      console.error("Failed to start chat:", err);
+      alert("Unable to start chat. Please try again.");
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this book?")) return;
 
@@ -67,24 +78,31 @@ const Books = () => {
           {books.map((book) => (
             <div
               key={book._id}
-              className="border rounded p-4 shadow hover:shadow-lg transition"
+              className="border rounded p-4 shadow hover:shadow-lg transition cursor-pointer"
+              onClick={() => {
+                if (!user) {
+                  navigate(`/books/${book._id}`);
+                } else if (book.listedBy !== user._id) {
+                  handleChat(book._id);
+                } else {
+                  navigate(`/books/${book._id}`);
+                }
+              }}
             >
-              <Link to={`/books/${book._id}`}>
-                <img
-                  src={book.image}
-                  alt={book.title}
-                  className="h-40 w-full object-contain rounded mb-2"
-                />
-                <h2 className="text-xl font-semibold">{book.title}</h2>
-                <p className="text-sm text-gray-600">by {book.author}</p>
-                <p className="mt-2">
-                  {book.isFree ? "Free" : `$${book.price}`}
-                </p>
-              </Link>
+              <img
+                src={book.image}
+                alt={book.title}
+                className="h-40 w-full object-contain rounded mb-2"
+              />
+              <h2 className="text-xl font-semibold">{book.title}</h2>
+              <p className="text-sm text-gray-600">by {book.author}</p>
+              <p className="mt-2">{book.isFree ? "Free" : `$${book.price}`}</p>
 
-              {/* Edit/Delete Buttons */}
               {user && book.listedBy === user._id && (
-                <div className="mt-4 flex gap-2">
+                <div
+                  className="mt-4 flex gap-2"
+                  onClick={(e) => e.stopPropagation()} // prevent parent click
+                >
                   <button
                     onClick={() => navigate(`/books/edit/${book._id}`)}
                     className="px-3 py-1 bg-blue-500 text-white rounded"
