@@ -147,6 +147,32 @@ const ChatDetailPage = () => {
         </div>
       )}
 
+      {/* Book Quick Info Bar - Always visible */}
+      {chat?.book && !showBookDetails && (
+        <div className="bg-blue-50 border-b p-2 flex items-center">
+          {chat.book.image && (
+            <div className="w-10 h-10 flex-shrink-0 mr-3">
+              <img
+                src={chat.book.image}
+                alt={chat.book.title}
+                className="w-full h-full object-cover rounded"
+              />
+            </div>
+          )}
+          <div className="flex-1 text-sm truncate">
+            <span className="font-medium">{chat.book.title}</span>
+            <span className="mx-2">•</span>
+            <span>{chat.book.isFree ? "Free" : `$${chat.book.price}`}</span>
+          </div>
+          <button
+            onClick={handleViewBook}
+            className="text-blue-600 text-xs px-2 py-1 border border-blue-300 rounded ml-2"
+          >
+            View
+          </button>
+        </div>
+      )}
+
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
         <div className="space-y-3">
