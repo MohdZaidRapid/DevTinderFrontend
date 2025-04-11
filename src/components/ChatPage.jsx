@@ -4,7 +4,7 @@ import axios from "../lib/axios";
 import { io } from "socket.io-client";
 import { AuthContext } from "../context/AuthContext";
 
-const socket = io(import.meta.env.VITE_SOCKET_URL); // Your Socket.IO server URL
+const socket = io(import.meta.env.VITE_SOCKET_URL);
 
 const ChatPage = () => {
   const { chatId } = useParams();
@@ -46,7 +46,6 @@ const ChatPage = () => {
     };
   }, []);
 
-  // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -78,7 +77,6 @@ const ChatPage = () => {
     }
   };
 
-  // Find the other participant
   const otherUser = chat?.participants?.find((p) => p._id !== user?._id);
 
   return (
@@ -119,10 +117,14 @@ const ChatPage = () => {
               {chat.book.author && (
                 <p className="text-sm text-gray-600">By {chat.book.author}</p>
               )}
-              <p className="text-sm">
-                <span className="font-medium">Price:</span>{" "}
-                {chat.book.isFree ? "Free" : `$${chat.book.price}`}
-              </p>
+              {!chat.book.isFree && chat.book.price && (
+                <p className="text-sm">
+                  <span className="font-medium">Price:</span> ${chat.book.price}
+                </p>
+              )}
+              {chat.book.isFree && (
+                <p className="text-sm text-green-600 font-semibold">Free</p>
+              )}
               {chat.book.condition && (
                 <p className="text-sm">
                   <span className="font-medium">Condition:</span>{" "}
@@ -142,7 +144,7 @@ const ChatPage = () => {
         </div>
       )}
 
-      {/* Book Quick Info Bar - Always visible when not showing details */}
+      {/* Quick Info Bar */}
       {chat?.book && !showBookDetails && (
         <div className="bg-blue-50 border-b p-2 flex items-center">
           {chat.book.image && (
@@ -157,7 +159,12 @@ const ChatPage = () => {
           <div className="flex-1 text-sm truncate">
             <span className="font-medium">{chat.book.title}</span>
             <span className="mx-2">•</span>
-            <span>{chat.book.isFree ? "Free" : `$${chat.book.price}`}</span>
+            {!chat.book.isFree && chat.book.price && (
+              <span>${chat.book.price}</span>
+            )}
+            {chat.book.isFree && (
+              <span className="text-green-600 font-medium">Free</span>
+            )}
           </div>
           <button
             onClick={handleViewBook}
@@ -168,7 +175,7 @@ const ChatPage = () => {
         </div>
       )}
 
-      {/* Messages area */}
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
         {messages.map((m, i) => (
           <div
@@ -188,7 +195,7 @@ const ChatPage = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Message input */}
+      {/* Input */}
       <div className="bg-white border-t p-3 flex gap-2">
         <input
           value={message}
