@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "../lib/axios";
 import { io } from "socket.io-client";
 import { AuthContext } from "../context/AuthContext";
+import { motion } from "framer-motion";
 
 const socket = io(import.meta.env.VITE_SOCKET_URL);
 
@@ -46,9 +47,9 @@ const ChatPage = () => {
     };
   }, []);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  // useEffect(() => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // }, [messages]);
 
   const sendMessage = () => {
     if (!message.trim()) return;
@@ -66,150 +67,128 @@ const ChatPage = () => {
     setMessage("");
   };
 
-  const toggleBookDetails = () => {
-    setShowBookDetails(!showBookDetails);
-  };
+  const toggleBookDetails = () => setShowBookDetails((prev) => !prev);
 
   const handleViewBook = (e) => {
     e.stopPropagation();
-    if (chat?.book?._id) {
-      navigate(`/books/${chat.book._id}`);
-    }
+    if (chat?.book?._id) navigate(`/books/${chat.book._id}`);
   };
 
   const otherUser = chat?.participants?.find((p) => p._id !== user?._id);
 
   return (
-    <div className="flex flex-col h-screen max-w-2xl mx-auto">
-      {/* Chat header */}
-      <div className="bg-white border-b p-4 flex items-center">
-        <div>
-          <h2 className="text-xl font-bold">{otherUser?.name || "Chat"}</h2>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-100 dark:from-gray-800 dark:via-gray-900 dark:to-black p-4">
+      <div className="max-w-3xl mx-auto rounded-xl shadow-xl overflow-hidden bg-white/30 backdrop-blur-md dark:bg-black/30">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {otherUser?.name || "Chat"}
+            </h2>
+            {chat?.book && (
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                About: {chat.book.title}
+              </p>
+            )}
+          </div>
           {chat?.book && (
-            <p className="text-sm text-gray-600">About: {chat.book.title}</p>
+            <button
+              onClick={toggleBookDetails}
+              className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              {showBookDetails ? "Hide Book" : "Show Book"}
+            </button>
           )}
         </div>
-        {chat?.book && (
-          <button
-            onClick={toggleBookDetails}
-            className="ml-auto text-blue-600 text-sm"
+
+        {/* Book details */}
+        {showBookDetails && chat?.book && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white/40 dark:bg-white/10 border-b px-4 py-3"
           >
-            {showBookDetails ? "Hide Book" : "Show Book"}
-          </button>
-        )}
-      </div>
-
-      {/* Book details panel */}
-      {showBookDetails && chat?.book && (
-        <div className="bg-gray-50 border-b p-3">
-          <div className="flex">
-            {chat.book.image && (
-              <div className="w-20 h-20 flex-shrink-0">
-                <img
-                  src={chat.book.image}
-                  alt={chat.book.title}
-                  className="w-full h-full object-cover rounded"
-                />
-              </div>
-            )}
-            <div className="ml-3 flex-1">
-              <h3 className="font-medium">{chat.book.title}</h3>
-              {chat.book.author && (
-                <p className="text-sm text-gray-600">By {chat.book.author}</p>
-              )}
-              {!chat.book.isFree && chat.book.price && (
-                <p className="text-sm">
-                  <span className="font-medium">Price:</span> ${chat.book.price}
-                </p>
-              )}
-              {chat.book.isFree && (
-                <p className="text-sm text-green-600 font-semibold">Free</p>
-              )}
-              {chat.book.condition && (
-                <p className="text-sm">
-                  <span className="font-medium">Condition:</span>{" "}
-                  {chat.book.condition}
-                </p>
-              )}
-            </div>
-          </div>
-          <div className="mt-2 flex justify-end">
-            <button
-              onClick={handleViewBook}
-              className="text-blue-600 text-sm hover:underline"
-            >
-              View Full Details
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Quick Info Bar */}
-      {chat?.book && !showBookDetails && (
-        <div className="bg-blue-50 border-b p-2 flex items-center">
-          {chat.book.image && (
-            <div className="w-10 h-10 flex-shrink-0 mr-3">
+            <div className="flex gap-3 items-start">
               <img
                 src={chat.book.image}
                 alt={chat.book.title}
-                className="w-full h-full object-cover rounded"
+                className="w-20 h-20 object-cover rounded"
               />
+              <div>
+                <h3 className="font-semibold text-gray-800 dark:text-white">
+                  {chat.book.title}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  By {chat.book.author}
+                </p>
+                {chat.book.isFree ? (
+                  <p className="text-green-600 font-medium">Free</p>
+                ) : (
+                  <p className="text-sm">
+                    <span className="font-medium">Price:</span> $
+                    {chat.book.price}
+                  </p>
+                )}
+                {chat.book.condition && (
+                  <p className="text-sm">
+                    <span className="font-medium">Condition:</span>{" "}
+                    {chat.book.condition}
+                  </p>
+                )}
+              </div>
             </div>
-          )}
-          <div className="flex-1 text-sm truncate">
-            <span className="font-medium">{chat.book.title}</span>
-            <span className="mx-2">•</span>
-            {!chat.book.isFree && chat.book.price && (
-              <span>${chat.book.price}</span>
-            )}
-            {chat.book.isFree && (
-              <span className="text-green-600 font-medium">Free</span>
-            )}
-          </div>
+            <div className="mt-2 text-right">
+              <button
+                onClick={handleViewBook}
+                className="text-blue-500 text-sm hover:underline"
+              >
+                View Full Details
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Messages */}
+        <div className="h-[450px] overflow-y-auto px-4 py-2 space-y-3 bg-gradient-to-br from-white/20 to-white/10 dark:from-gray-800/30 dark:to-gray-700/20">
+          {messages.map((m, i) => {
+            const isMe = m.sender._id === user._id;
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`max-w-[75%] p-3 rounded-xl shadow-sm ${
+                  isMe
+                    ? "ml-auto bg-blue-500 text-white"
+                    : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                }`}
+              >
+                <p className="break-words">{m.content}</p>
+                <p className="text-xs mt-1 opacity-70">
+                  {new Date(m.createdAt).toLocaleTimeString()}
+                </p>
+              </motion.div>
+            );
+          })}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input */}
+        <div className="flex items-center gap-2 p-4 border-t dark:border-gray-700 bg-white/30 dark:bg-white/10 backdrop-blur-sm">
+          <input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+            placeholder="Type a message..."
+            className="flex-1 px-4 py-2 rounded-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 dark:text-white"
+          />
           <button
-            onClick={handleViewBook}
-            className="text-blue-600 text-xs px-2 py-1 border border-blue-300 rounded ml-2"
+            onClick={sendMessage}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full transition-all"
           >
-            View
+            Send
           </button>
         </div>
-      )}
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={`p-3 rounded-lg max-w-xs md:max-w-md mb-3 ${
-              m.sender._id === user?._id ? "bg-blue-100 ml-auto" : "bg-white"
-            }`}
-          >
-            <p>
-              <strong>{m.sender.name}:</strong> {m.content}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              {new Date(m.createdAt).toLocaleString()}
-            </p>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input */}
-      <div className="bg-white border-t p-3 flex gap-2">
-        <input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your message"
-          className="flex-1 border p-2 rounded"
-          onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-        />
-        <button
-          onClick={sendMessage}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          Send
-        </button>
       </div>
     </div>
   );

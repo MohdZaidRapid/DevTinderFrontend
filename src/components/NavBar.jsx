@@ -134,12 +134,20 @@ const Navbar = () => {
             Logout
           </button>
         ) : (
-          <Link
-            to="/login"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
-          >
-            Login
-          </Link>
+          <>
+            <Link
+              to="/login"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+            >
+              Login
+            </Link>
+            <Link
+              to="/register"
+              className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded ml-2"
+            >
+              Sign Up
+            </Link>
+          </>
         )}
       </div>
     </nav>
