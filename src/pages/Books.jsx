@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import axios from "../lib/axios";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 const Books = () => {
@@ -58,27 +58,33 @@ const Books = () => {
   }, [search, page]);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Book Listings</h1>
+    <div className="p-6 bg-gradient-to-br from-white via-blue-50 to-purple-100 min-h-screen">
+      <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-8">
+        📚 Explore Books
+      </h1>
 
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search books..."
-        className="border p-2 rounded mb-4 w-full"
-      />
+      <div className="max-w-2xl mx-auto mb-6">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="🔍 Search for a book..."
+          className="w-full px-4 py-3 rounded-xl shadow-inner border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
+        />
+      </div>
 
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-center text-lg text-gray-600 animate-pulse">
+          Loading books...
+        </p>
       ) : error ? (
-        <p className="text-red-500">{error}</p>
+        <p className="text-center text-red-500">{error}</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {books.map((book) => (
             <div
               key={book._id}
-              className="border rounded p-4 shadow hover:shadow-lg transition cursor-pointer"
+              className="bg-white/70 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 p-5 cursor-pointer flex flex-col justify-between"
               onClick={() => {
                 if (!user) {
                   navigate(`/books/${book._id}`);
@@ -90,28 +96,35 @@ const Books = () => {
               }}
             >
               <img
-                src={book.image}
+                src={book.image || "/default-book.jpg"}
+                onError={(e) => (e.target.src = "/default-book.jpg")}
                 alt={book.title}
-                className="h-40 w-full object-contain rounded mb-2"
+                className="h-48 w-full object-cover rounded-xl mb-4 shadow-sm"
               />
-              <h2 className="text-xl font-semibold">{book.title}</h2>
-              <p className="text-sm text-gray-600">by {book.author}</p>
-              <p className="mt-2">{book.isFree ? "Free" : `$${book.price}`}</p>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-gray-800">
+                  {book.title}
+                </h2>
+                <p className="text-sm text-gray-500">by {book.author}</p>
+                <p className="mt-2 text-lg font-medium text-purple-700">
+                  {book.isFree ? "Free" : `$${book.price}`}
+                </p>
+              </div>
 
               {user && book.listedBy === user._id && (
                 <div
-                  className="mt-4 flex gap-2"
-                  onClick={(e) => e.stopPropagation()} // prevent parent click
+                  className="mt-4 flex gap-3"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <button
                     onClick={() => navigate(`/books/edit/${book._id}`)}
-                    className="px-3 py-1 bg-blue-500 text-white rounded"
+                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(book._id)}
-                    className="px-3 py-1 bg-red-500 text-white rounded"
+                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition"
                   >
                     Delete
                   </button>
@@ -122,18 +135,20 @@ const Books = () => {
         </div>
       )}
 
-      <div className="flex justify-center mt-6 space-x-4">
+      <div className="flex justify-center mt-10 space-x-4">
         <button
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          className="px-4 py-2 border rounded"
+          className="px-5 py-2 rounded-xl border bg-white shadow hover:bg-gray-100 disabled:opacity-40"
+          disabled={page === 1}
         >
-          Prev
+          ⬅ Prev
         </button>
         <button
           onClick={() => setPage((prev) => prev + 1)}
-          className="px-4 py-2 border rounded"
+          className="px-5 py-2 rounded-xl border bg-white shadow hover:bg-gray-100 disabled:opacity-40"
+          disabled={books.length < 10}
         >
-          Next
+          Next ➡
         </button>
       </div>
     </div>
