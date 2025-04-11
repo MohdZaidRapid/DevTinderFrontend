@@ -11,11 +11,15 @@ import AddBook from "../pages/AddBook.jsx";
 import ChatPage from "../components/ChatPage.jsx";
 import InboxPage from "../pages/InboxPage.jsx";
 import NotificationsPage from "../pages/NotificationsPage.jsx";
+import BookMessages from "../components/BookMessages";
+import ChatConversation from "../components/ChatConversation";
+import BooksList from "../components/BooksList";
 
 const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/books" element={<BooksList />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/books/:id" element={<BookDetails />} />
@@ -23,6 +27,8 @@ const AppRoutes = () => {
       <Route path="/chat/:chatId" element={<ChatPage />} />
       <Route path="/inbox" element={<InboxPage />} />
       <Route path="/notifications" element={<NotificationsPage />} />
+      <Route path="/books/:bookId/messages" element={<BookMessages />} />
+      <Route path="/chats/:chatId" element={<ChatConversation />} />
 
       {/* ✅ Protected Routes wrapped correctly */}
       <Route
